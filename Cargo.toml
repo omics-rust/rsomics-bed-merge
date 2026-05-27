@@ -1,0 +1,32 @@
+[package]
+name = "rsomics-bed-merge"
+version = "0.1.0"
+description = "Merge overlapping BED intervals — bedtools merge equivalent"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+categories = ["science", "command-line-utilities"]
+keywords = ["bed", "merge", "bedtools", "bioinformatics", "intervals"]
+
+[[bin]]
+name = "rsomics-bed-merge"
+path = "src/main.rs"
+
+[lib]
+name = "rsomics_bed_merge"
+path = "src/lib.rs"
+doctest = false
+
+[dependencies]
+rsomics-common = { version = "0.6" }
+rsomics-help = { version = "0.3" }
+rsomics-intervals = { version = "0.1" }
+clap = { version = "4", features = ["derive"] }
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints]
+workspace = true
