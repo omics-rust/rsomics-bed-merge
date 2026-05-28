@@ -25,8 +25,12 @@ pub struct Cli {
 }
 
 impl Tool for Cli {
-    fn meta() -> ToolMeta { META }
-    fn common(&self) -> &CommonFlags { &self.common }
+    fn meta() -> ToolMeta {
+        META
+    }
+    fn common(&self) -> &CommonFlags {
+        &self.common
+    }
 
     fn execute(self) -> Result<()> {
         let mut stdout_lock;

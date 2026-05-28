@@ -19,10 +19,22 @@ fn basic_merge_correctness() {
     // chr1: [100,200) + [150,300) merge to [100,300); [400,500) separate → 2 lines
     // chr2: [10,50) + [45,100) merge to [10,100); [200,300) separate → 2 lines
     assert_eq!(lines.len(), 4, "expected 4 merged intervals: {result}");
-    assert!(result.contains("chr1\t100\t300"), "chr1 merge wrong: {result}");
-    assert!(result.contains("chr1\t400\t500"), "chr1 separate wrong: {result}");
-    assert!(result.contains("chr2\t10\t100"), "chr2 merge wrong: {result}");
-    assert!(result.contains("chr2\t200\t300"), "chr2 separate wrong: {result}");
+    assert!(
+        result.contains("chr1\t100\t300"),
+        "chr1 merge wrong: {result}"
+    );
+    assert!(
+        result.contains("chr1\t400\t500"),
+        "chr1 separate wrong: {result}"
+    );
+    assert!(
+        result.contains("chr2\t10\t100"),
+        "chr2 merge wrong: {result}"
+    );
+    assert!(
+        result.contains("chr2\t200\t300"),
+        "chr2 separate wrong: {result}"
+    );
 }
 
 #[test]
