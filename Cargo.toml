@@ -2,11 +2,11 @@
 name = "rsomics-bed-merge"
 version = "0.1.0"
 description = "Merge overlapping BED intervals — bedtools merge equivalent"
-edition.workspace = true
-rust-version.workspace = true
-license.workspace = true
-repository.workspace = true
-authors.workspace = true
+edition = "2024"
+rust-version = "1.91"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/omics-rust/rsomics-bed-merge"
+authors = ["Zane Leong <efd@live.com>"]
 categories = ["science", "command-line-utilities"]
 keywords = ["bed", "merge", "bedtools", "bioinformatics", "intervals"]
 
@@ -28,5 +28,3 @@ clap = { version = "4", features = ["derive"] }
 [dev-dependencies]
 tempfile = "3"
 
-[lints]
-workspace = true
