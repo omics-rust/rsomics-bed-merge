@@ -38,6 +38,21 @@ fn basic_merge_correctness() {
 }
 
 #[test]
+fn golden_matches_committed_upstream() {
+    let input = golden("sorted.bed");
+    let expected = std::fs::read_to_string(golden("merge.upstream.expected")).unwrap();
+
+    let mut ours = Vec::new();
+    merge(&input, &mut ours).unwrap();
+    let ours_str = String::from_utf8(ours).unwrap();
+
+    assert_eq!(
+        ours_str, expected,
+        "output differs from bedtools merge golden"
+    );
+}
+
+#[test]
 fn bedtools_compat() {
     let bedtools = Command::new("bedtools").arg("--version").output();
     if bedtools.is_err() || !bedtools.unwrap().status.success() {
