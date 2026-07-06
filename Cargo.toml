@@ -1,6 +1,6 @@
 [package]
 name = "rsomics-bed-merge"
-version = "0.2.0"
+version = "0.2.1"
 description = "Merge overlapping BED intervals — bedtools merge equivalent"
 edition = "2024"
 rust-version = "1.91"
@@ -22,7 +22,7 @@ doctest = false
 [dependencies]
 rsomics-common = { version = "0.6" }
 rsomics-help = { version = "0.3" }
-rsomics-intervals = { version = "0.1" }
+rsomics-intervals = { version = "0.2" }
 clap = { version = "4", features = ["derive"] }
 
 [dev-dependencies]

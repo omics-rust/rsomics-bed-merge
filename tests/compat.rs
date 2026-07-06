@@ -1,5 +1,6 @@
+use std::io::Write;
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 use rsomics_bed_merge::merge;
 
@@ -52,6 +53,63 @@ fn golden_matches_committed_upstream() {
     );
 }
 
+// Zero-length features (start == end) are virtually widened to [start-1, start+1]
+// for overlap and span, exactly as bedtools merge does: a standalone one passes
+// through verbatim, an adjacent one drags the merged span out by one, and a
+// widened low edge at coordinate 0 reaches -1.
+#[test]
+fn zero_length_golden_matches_committed_upstream() {
+    let input = golden("zero_length.bed");
+    let expected = std::fs::read_to_string(golden("zero_length.upstream.expected")).unwrap();
+
+    let mut ours = Vec::new();
+    merge(&input, &mut ours).unwrap();
+    let ours_str = String::from_utf8(ours).unwrap();
+
+    assert_eq!(
+        ours_str, expected,
+        "zero-length output differs from bedtools merge golden"
+    );
+}
+
+#[test]
+fn zero_length_key_cases() {
+    let mut ours = Vec::new();
+    merge(&golden("zero_length.bed"), &mut ours).unwrap();
+    let out = String::from_utf8(ours).unwrap();
+    // standalone zero-length is emitted verbatim
+    assert!(out.contains("chr1\t10\t10\n"), "{out}");
+    assert!(out.contains("chr4\t40\t40\n"), "{out}");
+    // adjacent zero-length widens the merged span by one
+    assert!(out.contains("chr1\t250\t261\n"), "{out}");
+    // two coincident zero-length features merge to their shared widened footprint
+    assert!(out.contains("chr4\t9\t11\n"), "{out}");
+    // widening the low edge at coordinate 0 reaches -1
+    assert!(out.contains("chr1\t-1\t5\n"), "{out}");
+}
+
+#[test]
+fn inverted_interval_fails_loud() {
+    let bin = env!("CARGO_BIN_EXE_rsomics-bed-merge");
+    let mut child = Command::new(bin)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(b"chr1\t200\t100\n")
+        .unwrap();
+    let status = child.wait().unwrap();
+    assert!(
+        !status.success(),
+        "start > end must exit non-zero, got {status}"
+    );
+}
+
 #[test]
 fn bedtools_compat() {
     let bedtools = Command::new("bedtools").arg("--version").output();
@@ -60,22 +118,22 @@ fn bedtools_compat() {
         return;
     }
 
-    let input = golden("sorted.bed");
-    let mut ours = Vec::new();
-    merge(&input, &mut ours).unwrap();
-    let ours_str = String::from_utf8(ours).unwrap();
+    for name in ["sorted.bed", "zero_length.bed"] {
+        let input = golden(name);
+        let mut ours = Vec::new();
+        merge(&input, &mut ours).unwrap();
+        let ours_str = String::from_utf8(ours).unwrap();
 
-    let bt = Command::new("bedtools")
-        .args(["merge", "-i"])
-        .arg(&input)
-        .output()
-        .expect("bedtools merge failed");
-    let bt_str = String::from_utf8(bt.stdout).unwrap();
+        let bt = Command::new("bedtools")
+            .args(["merge", "-i"])
+            .arg(&input)
+            .output()
+            .expect("bedtools merge failed");
+        let bt_str = String::from_utf8(bt.stdout).unwrap();
 
-    let mut ours_lines: Vec<&str> = ours_str.lines().filter(|l| !l.is_empty()).collect();
-    let mut bt_lines: Vec<&str> = bt_str.lines().filter(|l| !l.is_empty()).collect();
-    ours_lines.sort_unstable();
-    bt_lines.sort_unstable();
-
-    assert_eq!(ours_lines, bt_lines, "output differs from bedtools merge");
+        assert_eq!(
+            ours_str, bt_str,
+            "output differs from bedtools merge on {name}"
+        );
+    }
 }

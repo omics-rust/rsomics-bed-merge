@@ -549,7 +549,7 @@ checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
 
 [[package]]
 name = "rsomics-bed-merge"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "clap",
  "criterion",
@@ -587,9 +587,9 @@ dependencies = [
 
 [[package]]
 name = "rsomics-intervals"
-version = "0.1.7"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e26f694efcfdf0cdbe8755a1d12c98d060f831aaa677895c74c541a675644436"
+checksum = "eedde9c77b047e71759ebbeaf4ddc2d3fa5cce93c5f1f9a33b2bf8e5da0575ca"
 dependencies = [
  "coitrees",
  "rsomics-common",
